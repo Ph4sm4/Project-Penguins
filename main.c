@@ -2,6 +2,7 @@
 #include "time.h"
 #include "stdlib.h"
 #include "string.h"
+#include "Windows.h"
 #include "GameSystem/GameSystem.h"
 
 int main()
@@ -12,7 +13,13 @@ int main()
 
     Game.setup(&Game);
 
-    Game.displayUI(&Game);
+    for (;;)
+    {
+        Game.displayUI(&Game);
+        Game.askForAction(&Game);
+
+        system("cls");
+    }
 
     return 0;
 }

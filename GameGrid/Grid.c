@@ -4,31 +4,21 @@
 #include "string.h"
 #include "math.h"
 #include "time.h"
-
-#define ANSI_COLOR_RED "\x1b[31m"
-#define ANSI_COLOR_GREEN "\x1b[32m"
-#define ANSI_COLOR_YELLOW "\x1b[33m"
-#define ANSI_COLOR_BLUE "\x1b[34m"
-#define ANSI_COLOR_MAGENTA "\x1b[35m"
-#define ANSI_COLOR_CYAN "\x1b[36m"
-#define ANSI_COLOR_RESET "\x1b[0m"
-
-#define printfRed(fmt, ...) printf(ANSI_COLOR_RED fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
-#define printfGreen(fmt, ...) printf(ANSI_COLOR_GREEN fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
-#define printfYellow(fmt, ...) printf(ANSI_COLOR_YELLOW fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
-#define printfBlue(fmt, ...) printf(ANSI_COLOR_BLUE fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
-#define printfMagenta(fmt, ...) printf(ANSI_COLOR_MAGENTA fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
-#define printfCyan(fmt, ...) printf(ANSI_COLOR_CYAN fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
+#include "DisplayManager.h"
+#include "../Enums/TileOwner.h"
 
 // =========================================
-// available functions:
+// available public functions:
 
 struct GameGrid createGameGridObject();
 void constructGrid(struct GameGrid *obj);
 void printGridState(const struct GameGrid *obj, const enum GameState phase);
 void cleanupGrid(struct GameGrid *obj);
-int getRandomInt(const int min, const int max);
+int getGridSize(struct GameGrid *obj);
+
+// private functions:
 void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctaves, float *noiseOutput, float bias);
+int getRandomInt(const int min, const int max);
 
 // =========================================
 
@@ -37,8 +27,14 @@ struct GameGrid createGameGridObject()
     struct GameGrid obj;
     obj.constructGrid = &constructGrid;
     obj.printGridState = &printGridState;
+    obj.getGridSize = &getGridSize;
 
     return obj;
+}
+
+int getGridSize(struct GameGrid *obj)
+{
+    return obj->rows * obj->cols;
 }
 
 void constructGrid(struct GameGrid *obj)
@@ -108,6 +104,8 @@ void constructGrid(struct GameGrid *obj)
             (*p).x = i;
             (*p).y = j;
             (*p).label = (char *)malloc(strlen("##") + sizeof(char)); // + sizeof(char) for the null terminator
+            (*p).owner = (enum TileOwner)Unset;
+            (*p).removed = false;
 
             if (noiseFishNumber < 4)
             {
@@ -129,8 +127,6 @@ void constructGrid(struct GameGrid *obj)
                 strcpy((*p).label, "#3");
                 (*p).numberOfFishes = 3;
             }
-
-            (*p).removed = false;
         }
     }
 }
@@ -139,7 +135,8 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
 {
     // print 8 spaces before column numbers
     printf("\n\n\n");
-    printf("%*s", 7, "");
+    printf("%*sY%*s", 3, "", 3, "");
+
     int numSpaces;
     for (int i = 0; i < obj->cols; i++)
     {
@@ -151,7 +148,7 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
     {
         printf("-");
     }
-    printf("\n");
+    printf("\nX\n");
 
     for (int i = 0; i < obj->rows; i++)
     {
@@ -163,24 +160,40 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
         {
             numSpaces = 3;
             char *label = obj->grid[i][j].label;
-            if (!strcmp(label, "##"))
+            int fishNum = obj->grid[i][j].numberOfFishes;
+            if (phase == (enum GameState)PlacingPhase)
             {
-                if (phase == (enum GameState)PlacingPhase)
+                if (!strcmp(label, "P1"))
+                {
+                    printfOrange("%s%*s", label, numSpaces, "");
+                }
+                else if (!strcmp(label, "P2"))
+                {
+                    printfGreen("%s%*s", label, numSpaces, "");
+                }
+                else if (fishNum == 1)
                 {
                     printfYellow("%s%*s", label, numSpaces, "");
                 }
                 else
                 {
-                    printfCyan("%s%*s", label, numSpaces, "");
+                    printfGray("%s%*s", label, numSpaces, "");
                 }
-            }
-            else if (!strcmp(label, "P "))
-            {
-                printfBlue("%s%*s", label, numSpaces, "");
             }
             else
             {
-                printfCyan("%s%*s", label, numSpaces, "");
+                if (!strcmp(label, "P1"))
+                {
+                    printfOrange("%s%*s", label, numSpaces, "");
+                }
+                else if (!strcmp(label, "P2"))
+                {
+                    printfGreen("%s%*s", label, numSpaces, "");
+                }
+                else
+                {
+                    printfCyan("%s%*s", label, numSpaces, "");
+                }
             }
         }
         printf("\n");

@@ -4,7 +4,7 @@
 #include "../GameGrid/Grid.h"
 #include "../Player/Player.h"
 #include "stdbool.h"
-#include "../GameState/GameState.h"
+#include "../Enums/GameState.h"
 
 struct GameSystem
 {
