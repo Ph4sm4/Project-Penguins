@@ -106,6 +106,7 @@ void constructGrid(struct GameGrid *obj)
             (*p).owner = NULL;
             (*p).removed = false;
             (*p).selected = false;
+            (*p).penguinBlocked = false;
 
             if (noiseFishNumber < 4)
             {
@@ -182,7 +183,15 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
             }
             else
             {
-                if ((!strcmp(label, "P1") || !strcmp(label, "P2")) && obj->grid[i][j].selected)
+                if (obj->grid[i][j].removed && !obj->grid[i][j].owner)
+                {
+                    printf("%s%*s", label, numSpaces, "");
+                }
+                else if (obj->grid[i][j].penguinBlocked)
+                {
+                    printfGray("%s%*s", label, numSpaces, "");
+                }
+                else if ((!strcmp(label, "P1") || !strcmp(label, "P2")) && obj->grid[i][j].selected)
                 {
                     printfOrangeNBackgroundYellow("%s", label);
                     printf("%*s", numSpaces, "");

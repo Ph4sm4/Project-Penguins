@@ -11,6 +11,7 @@ struct GridPoint
     bool removed;
     int numberOfFishes;
     bool selected;
+    bool penguinBlocked;
 
     struct Player *owner;
 };

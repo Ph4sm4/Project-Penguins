@@ -4,8 +4,9 @@
 struct Player
 {
     char *name;
-    int index;
     int collectedFishes;
+
+    int blockedPenguins;
 };
 
 struct Player createPlayerObject();
