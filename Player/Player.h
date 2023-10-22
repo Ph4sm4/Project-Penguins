@@ -4,6 +4,7 @@
 struct Player
 {
     char *name;
+    int index;
     int collectedFishes;
 };
 

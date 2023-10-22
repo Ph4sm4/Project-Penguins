@@ -5,7 +5,6 @@
 #include "math.h"
 #include "time.h"
 #include "DisplayManager.h"
-#include "../Enums/TileOwner.h"
 
 // =========================================
 // available public functions:
@@ -104,8 +103,9 @@ void constructGrid(struct GameGrid *obj)
             (*p).x = i;
             (*p).y = j;
             (*p).label = (char *)malloc(strlen("##") + sizeof(char)); // + sizeof(char) for the null terminator
-            (*p).owner = (enum TileOwner)Unset;
+            (*p).owner = NULL;
             (*p).removed = false;
+            (*p).selected = false;
 
             if (noiseFishNumber < 4)
             {
@@ -182,7 +182,12 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
             }
             else
             {
-                if (!strcmp(label, "P1"))
+                if ((!strcmp(label, "P1") || !strcmp(label, "P2")) && obj->grid[i][j].selected)
+                {
+                    printfOrangeNBackgroundYellow("%s", label);
+                    printf("%*s", numSpaces, "");
+                }
+                else if (!strcmp(label, "P1"))
                 {
                     printfOrange("%s%*s", label, numSpaces, "");
                 }

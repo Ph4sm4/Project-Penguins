@@ -2,7 +2,6 @@
 #define GRID_POINT_H
 
 #include <stdbool.h>
-#include "../Enums/TileOwner.h"
 
 struct GridPoint
 {
@@ -11,8 +10,9 @@ struct GridPoint
     char *label;
     bool removed;
     int numberOfFishes;
+    bool selected;
 
-    enum TileOwner owner;
+    struct Player *owner;
 };
 
 #endif

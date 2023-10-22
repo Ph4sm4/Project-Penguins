@@ -14,8 +14,10 @@ void askForAction(struct GameSystem *game);
 
 // private functions:
 void moveAPenguin(struct GameGrid *gameGrid, const int xFrom, const int yFrom, const int xTo, const int yTo);
-void placeAPenguin(struct GameGrid *gameGrid, const int x, const int y, const bool playerTurn);
+void placeAPenguin(struct GameGrid *gameGrid, struct GridPoint *point, struct GameSystem *game);
 void printfError(char *message);
+bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
+struct Player *getCurrentPlayer(struct GameSystem *game);
 
 // =========================================
 
@@ -28,7 +30,10 @@ createGameSystemObject()
     obj.phase = (enum GameState)PlacingPhase;
 
     obj.player_1 = createPlayerObject();
+    obj.player_1.index = 0;
+
     obj.player_2 = createPlayerObject();
+    obj.player_2.index = 1;
 
     // setting function references
     obj.setup = &setup;
@@ -63,20 +68,29 @@ void setup(struct GameSystem *game)
 void displayUI(struct GameSystem *game)
 {
     welcomeLine();
-    printf("%s's points: %d\n", game->player_1.name, game->player_1.collectedFishes);
-    printf("%s's points: %d\n", game->player_2.name, game->player_2.collectedFishes);
+    printfOrange("%s's (P1)", game->player_1.name);
+    printf(" points: %d\n", game->player_1.collectedFishes);
+
+    printfGreen("%s's (P2)", game->player_2.name);
+    printf(" points: %d\n", game->player_2.collectedFishes);
 
     game->GameGrid.printGridState(&game->GameGrid, game->phase);
 }
 
+struct Player *getCurrentPlayer(struct GameSystem *game)
+{
+    return (!game->playerTurn ? &game->player_1 : &game->player_2);
+}
+
 void askForAction(struct GameSystem *game)
 {
-    int x, y;
     switch (game->phase)
     {
     case (enum GameState)PlacingPhase:
     {
-        printf("\n\n%s's turn to place a penguin (x,y): ", (!game->playerTurn ? game->player_1.name : game->player_2.name));
+        int x, y;
+
+        printf("\n\n%s's turn to place a penguin (x,y): ", getCurrentPlayer(game)->name);
         scanf("%d %d", &x, &y);
 
         // 0 based x's and y's
@@ -85,38 +99,76 @@ void askForAction(struct GameSystem *game)
 
         static int placedPenguins = 0;
 
-        if (!(x >= 0 && x < game->GameGrid.rows) || !(y >= 0 && y < game->GameGrid.cols))
+        if (!isPointInBounds(&game->GameGrid, x, y))
         {
             printfError("The following coordinates exceed the grid size!");
+            return;
         }
-        else if (game->GameGrid.grid[x][y].numberOfFishes != 1)
+        struct GridPoint *p = &game->GameGrid.grid[x][y];
+
+        if (p->numberOfFishes != 1)
         {
             printfError("You can only place penguins on unocuppied tiles with exactly 1 fish on it");
         }
-        else if (game->GameGrid.grid[x][y].owner != (enum TileOwner)Unset)
+        else if (p->owner != NULL)
         {
             printfError("This tile is occupied, choose a different one");
         }
         else
         {
-            placeAPenguin(&game->GameGrid, x, y, game->playerTurn);
+            placeAPenguin(&game->GameGrid, p, game);
             placedPenguins++;
 
+            getCurrentPlayer(game)->collectedFishes++;
             game->playerTurn = game->playerTurn ^ 1;
 
             if (placedPenguins == game->numberOfPenguins * 2)
             {
                 game->phase = (enum GameState)MovementPhase;
             }
-
-            break;
         }
+        break;
+    }
     case (enum GameState)MovementPhase:
     {
+        int penguinX, penguinY;
+        int toX, toY; // move to
+        printf("\n\n%s's turn to move. First choose a penguin (x, y): ", getCurrentPlayer(game)->name);
+        scanf("%d %d", &penguinX, &penguinY);
+
+        penguinX--;
+        penguinY--;
+
+        if (!isPointInBounds(&game->GameGrid, penguinX, penguinY))
+        {
+            printfError("The following coordinates exceed the grid size!");
+            return;
+        }
+        struct GridPoint *p = &game->GameGrid.grid[penguinX][penguinY];
+
+        if (p->owner == NULL)
+        {
+            printfError("This is not a penguin");
+        }
+        else if (p->owner != getCurrentPlayer(game))
+        {
+            char t[] = "This penguin belongs to ";
+            strcat(t, (game->playerTurn == 0 ? game->player_2.name : game->player_1.name));
+            printfError(t);
+        }
+        else
+        {
+            p->selected = true;
+        }
+
         break;
     }
     }
-    }
+}
+
+bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y)
+{
+    return x >= 0 && x < gameGrid->rows && y >= 0 && y < gameGrid->cols;
 }
 
 void printfError(char *message)
@@ -126,13 +178,11 @@ void printfError(char *message)
     getchar();
 }
 
-void placeAPenguin(struct GameGrid *gameGrid, const int x, const int y, const bool playerTurn)
+void placeAPenguin(struct GameGrid *gameGrid, struct GridPoint *point, struct GameSystem *game)
 {
-    struct GridPoint *p = &gameGrid->grid[x][y];
-
-    p->owner = (enum TileOwner)(!playerTurn ? Player1 : Player2);
-    p->removed = true;
-    strcpy(p->label, !playerTurn ? "P1" : "P2");
+    point->owner = getCurrentPlayer(game);
+    point->removed = true;
+    strcpy(point->label, game->playerTurn == 0 ? "P1" : "P2");
 }
 
 void moveAPenguin(struct GameGrid *gameGrid, const int xFrom, const int yFrom, const int xTo, const int yTo)

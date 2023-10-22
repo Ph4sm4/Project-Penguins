@@ -8,6 +8,7 @@
 #define ANSI_COLOR_RESET "\x1b[0m"
 #define ANSI_COLOR_WHITE "\x1b[37m"
 #define ANSI_COLOR_GRAY "\x1b[90m"
+#define ANSI_COLOR_BG_YELLOW "\x1b[43m"
 
 #define printfWhite(fmt, ...) printf(ANSI_COLOR_WHITE fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
 #define printfGray(fmt, ...) printf(ANSI_COLOR_GRAY fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
@@ -18,3 +19,4 @@
 #define printfMagenta(fmt, ...) printf(ANSI_COLOR_MAGENTA fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
 #define printfCyan(fmt, ...) printf(ANSI_COLOR_CYAN fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
 #define printfOrange(fmt, ...) printf(ANSI_COLOR_ORANGE fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
+#define printfOrangeNBackgroundYellow(fmt, ...) printf(ANSI_COLOR_ORANGE ANSI_COLOR_BG_YELLOW fmt ANSI_COLOR_RESET, ##__VA_ARGS__)
