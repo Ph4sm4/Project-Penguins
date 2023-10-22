@@ -5,6 +5,8 @@ project(ProjectPenguins)
 set(SOURCES
     main.c
     GameGrid/Grid.c
+    Player/Player.c
+    GameSystem/GameSystem.c
 )
 
 set(CMAKE_BUILD_TYPE Debug)

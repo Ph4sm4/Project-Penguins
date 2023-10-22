@@ -10,8 +10,6 @@ struct GridPoint
     char *label;
     bool removed;
     int numberOfFishes;
-
-    float noiseValue;
 };
 
 #endif

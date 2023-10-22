@@ -2,6 +2,7 @@
 #define GRID_H
 
 #include "GridPoint.h"
+#include "../GameState/GameState.h"
 
 struct GameGrid
 {
@@ -13,7 +14,7 @@ struct GameGrid
     float *perlinNoise2D;
 
     void (*constructGrid)(struct GameGrid *obj);
-    void (*printGridState)(const struct GameGrid *obj);
+    void (*printGridState)(const struct GameGrid *obj, const enum GameState phase);
     void (*cleanupGrid)(struct GameGrid *obj);
 };
 
