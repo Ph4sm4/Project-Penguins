@@ -17,12 +17,10 @@ void askForAction(struct GameSystem *game);
 void moveAPenguin(struct GameSystem *game, struct GridPoint *initialPoint, struct GridPoint *destination);
 void placeAPenguin(struct GameGrid *gameGrid, struct GridPoint *point, struct GameSystem *game);
 void printfError(char *message);
-bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
 struct Player *getCurrentPlayer(struct GameSystem *game);
 struct GridPoint *getValidatedChoicePoint(struct GameSystem *game, const int x, const int y);
 struct GridPoint *getValidatedMovePoint(struct GameSystem *game, struct GridPoint *initialPoint, const int x, const int y);
-void checkForBlockedPenguins(struct GameGrid *gameGrid);
-bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y);
+void printCurrentPlayerName(struct GameSystem *game);
 
 // =========================================
 
@@ -45,7 +43,7 @@ createGameSystemObject()
     obj.displayUI = &displayUI;
     obj.askForAction = &askForAction;
 
-    obj.numberOfPenguins = 2;
+    obj.numberOfPenguins = 1;
     obj.playerTurn = 0;
 
     return obj;
@@ -80,11 +78,54 @@ void displayUI(struct GameSystem *game)
     printf(" points: %d\n", game->player_2.collectedFishes);
 
     game->GameGrid.printGridState(&game->GameGrid, game->phase);
+
+    if (game->phase == (enum GameState)FinishPhase)
+    {
+        if (game->player_1.collectedFishes > game->player_2.collectedFishes)
+        {
+            printf("\n==============================\n");
+            printfYellow("%s's (P1) WON!", game->player_1.name);
+            printf(" points: %d\n", game->player_1.collectedFishes);
+
+            printf("==============================\n");
+
+            printfGreen("%s's (P2) LOST :/", game->player_2.name);
+            printf(" points: %d\n", game->player_2.collectedFishes);
+        }
+        else if (game->player_1.collectedFishes < game->player_2.collectedFishes)
+        {
+            printf("\n==============================\n");
+            printfYellow("%s's (P2) WON!", game->player_2.name);
+            printf(" points: %d\n", game->player_2.collectedFishes);
+
+            printf("==============================\n");
+
+            printfOrange("%s's (P1) LOST :/", game->player_1.name);
+            printf(" points: %d\n", game->player_1.collectedFishes);
+        }
+        else
+        {
+            printf("\n===============\n");
+            printfMagenta("There was a draw!!! Both players scored %d points", game->player_1.collectedFishes);
+        }
+    }
 }
 
 struct Player *getCurrentPlayer(struct GameSystem *game)
 {
     return (!game->playerTurn ? &game->player_1 : &game->player_2);
+}
+
+void printCurrentPlayerName(struct GameSystem *game)
+{
+    if (getCurrentPlayer(game) == &game->player_1)
+    {
+        printfOrange("\n%s's", getCurrentPlayer(game)->name);
+    }
+    else
+    {
+        printfGreen("\n%s's", getCurrentPlayer(game)->name);
+    }
 }
 
 void askForAction(struct GameSystem *game)
@@ -95,7 +136,8 @@ void askForAction(struct GameSystem *game)
     {
         int x, y;
 
-        printf("\n\n%s's turn to place a penguin (x,y): ", getCurrentPlayer(game)->name);
+        printCurrentPlayerName(game);
+        printf(" turn to place a penguin (x,y): ");
         scanf("%d %d", &x, &y);
 
         // 0 based x's and y's
@@ -104,7 +146,7 @@ void askForAction(struct GameSystem *game)
 
         static int placedPenguins = 0;
 
-        if (!isPointInBounds(&game->GameGrid, x, y))
+        if (!game->GameGrid.isPointInBounds(&game->GameGrid, x, y))
         {
             printfError("The following coordinates exceed the grid size!");
             return;
@@ -139,14 +181,24 @@ void askForAction(struct GameSystem *game)
         int penguinX, penguinY;
         int toX, toY; // move to
 
+        if (game->player_1.blockedPenguins == game->numberOfPenguins && game->player_2.blockedPenguins == game->numberOfPenguins)
+        {
+            printfMagenta("\nAll penguins on the map are blocked. Calculating results...");
+            game->phase = (enum GameState)FinishPhase;
+            Sleep(4000);
+            return;
+        }
         if (getCurrentPlayer(game)->blockedPenguins == game->numberOfPenguins)
         {
-            printfMagenta("All of %s's penguins are blocked. He loses his turn", getCurrentPlayer(game)->name);
+            printfMagenta("\nAll of %s's penguins are blocked. He loses his turn", getCurrentPlayer(game)->name);
             game->playerTurn = game->playerTurn ^ 1;
+            getchar();
+            getchar();
             return;
         }
 
-        printf("\n%s's turn to move. First choose a penguin (x, y): ", getCurrentPlayer(game)->name);
+        printCurrentPlayerName(game);
+        printf(" turn to move. First choose a penguin (x, y): ");
         scanf("%d %d", &penguinX, &penguinY);
 
         penguinX--;
@@ -166,7 +218,8 @@ void askForAction(struct GameSystem *game)
 
         for (;;)
         {
-            printf("\n%s's turn to move. Choose where to go (x, y): ", getCurrentPlayer(game)->name);
+            printCurrentPlayerName(game);
+            printf(" turn to move. Choose where to go (x, y): ");
             scanf("%d %d", &toX, &toY);
             toX--;
             toY--;
@@ -181,19 +234,22 @@ void askForAction(struct GameSystem *game)
 
         moveAPenguin(game, initialPoint, destination);
 
+        game->playerTurn = game->playerTurn ^ 1;
+
+        break;
+    }
+    case (enum GameState)FinishPhase:
+    {
+        exit(0);
+
         break;
     }
     }
 }
 
-bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y)
-{
-    return x >= 0 && x < gameGrid->rows && y >= 0 && y < gameGrid->cols;
-}
-
 struct GridPoint *getValidatedChoicePoint(struct GameSystem *game, const int x, const int y)
 {
-    if (!isPointInBounds(&game->GameGrid, x, y))
+    if (!game->GameGrid.isPointInBounds(&game->GameGrid, x, y))
     {
         printfError("The following coordinates exceed the grid size!");
         return NULL;
@@ -225,7 +281,7 @@ struct GridPoint *getValidatedChoicePoint(struct GameSystem *game, const int x, 
 
 struct GridPoint *getValidatedMovePoint(struct GameSystem *game, struct GridPoint *initialPoint, const int x, const int y)
 {
-    if (!isPointInBounds(&game->GameGrid, x, y))
+    if (!game->GameGrid.isPointInBounds(&game->GameGrid, x, y))
     {
         printfError("The following coordinates exceed the grid size!");
         return NULL;
@@ -325,32 +381,5 @@ void moveAPenguin(struct GameSystem *game, struct GridPoint *initialPoint, struc
     strcpy(destination->label, game->playerTurn == 0 ? "P1" : "P2");
     destination->owner = getCurrentPlayer(game);
 
-    game->playerTurn = game->playerTurn ^ 1;
-
-    checkForBlockedPenguins(&game->GameGrid);
-}
-
-bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y)
-{
-    return isPointInBounds(gameGrid, x, y) && gameGrid->grid[x][y].owner == NULL && gameGrid->grid[x][y].removed == false;
-}
-
-void checkForBlockedPenguins(struct GameGrid *gameGrid)
-{
-    for (int x = 0; x < gameGrid->rows; x++)
-    {
-        for (int y = 0; y < gameGrid->cols; y++)
-        {
-            if (gameGrid->grid[x][y].owner == NULL)
-                continue;
-
-            if (!(canMoveToPoint(gameGrid, x + 1, y) || canMoveToPoint(gameGrid, x - 1, y) ||
-                  canMoveToPoint(gameGrid, x, y + 1) ||
-                  canMoveToPoint(gameGrid, x, y - 1)))
-            {
-                gameGrid->grid[x][y].penguinBlocked = true;
-                gameGrid->grid[x][y].owner->blockedPenguins++;
-            }
-        }
-    }
+    game->GameGrid.checkForBlockedPenguins(&game->GameGrid);
 }

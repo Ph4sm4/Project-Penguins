@@ -4,6 +4,7 @@
 #include "string.h"
 #include "Windows.h"
 #include "GameSystem/GameSystem.h"
+#include "Enums/GameState.h"
 
 int main()
 {

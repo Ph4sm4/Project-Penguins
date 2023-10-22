@@ -5,6 +5,7 @@
 #include "math.h"
 #include "time.h"
 #include "DisplayManager.h"
+#include "../Player/Player.h"
 
 // =========================================
 // available public functions:
@@ -14,10 +15,13 @@ void constructGrid(struct GameGrid *obj);
 void printGridState(const struct GameGrid *obj, const enum GameState phase);
 void cleanupGrid(struct GameGrid *obj);
 int getGridSize(struct GameGrid *obj);
+void checkForBlockedPenguins(struct GameGrid *gameGrid);
+bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
 
 // private functions:
 void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctaves, float *noiseOutput, float bias);
 int getRandomInt(const int min, const int max);
+bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y);
 
 // =========================================
 
@@ -27,6 +31,8 @@ struct GameGrid createGameGridObject()
     obj.constructGrid = &constructGrid;
     obj.printGridState = &printGridState;
     obj.getGridSize = &getGridSize;
+    obj.checkForBlockedPenguins = &checkForBlockedPenguins;
+    obj.isPointInBounds = &isPointInBounds;
 
     return obj;
 }
@@ -309,4 +315,34 @@ void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctave
              */
         }
     }
+}
+
+void checkForBlockedPenguins(struct GameGrid *gameGrid)
+{
+    for (int x = 0; x < gameGrid->rows; x++)
+    {
+        for (int y = 0; y < gameGrid->cols; y++)
+        {
+            if (gameGrid->grid[x][y].owner == NULL)
+                continue;
+
+            if (!gameGrid->grid[x][y].penguinBlocked && !(canMoveToPoint(gameGrid, x + 1, y) || canMoveToPoint(gameGrid, x - 1, y) ||
+                                                          canMoveToPoint(gameGrid, x, y + 1) ||
+                                                          canMoveToPoint(gameGrid, x, y - 1)))
+            {
+                gameGrid->grid[x][y].penguinBlocked = true;
+                gameGrid->grid[x][y].owner->blockedPenguins++;
+            }
+        }
+    }
+}
+
+bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y)
+{
+    return isPointInBounds(gameGrid, x, y) && gameGrid->grid[x][y].owner == NULL && gameGrid->grid[x][y].removed == false;
+}
+
+bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y)
+{
+    return x >= 0 && x < gameGrid->rows && y >= 0 && y < gameGrid->cols;
 }
