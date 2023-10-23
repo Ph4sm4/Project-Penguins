@@ -15,7 +15,6 @@ struct GameGrid
 
     void (*constructGrid)(struct GameGrid *obj);
     void (*printGridState)(const struct GameGrid *obj, const enum GameState phase);
-    void (*cleanupGrid)(struct GameGrid *obj);
     int (*getGridSize)(struct GameGrid *obj);
     void (*checkForBlockedPenguins)(struct GameGrid *gameGrid);
     bool (*isPointInBounds)(const struct GameGrid *gameGrid, const int x, const int y);

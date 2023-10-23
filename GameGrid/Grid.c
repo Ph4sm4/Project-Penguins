@@ -13,7 +13,6 @@
 struct GameGrid createGameGridObject();
 void constructGrid(struct GameGrid *obj);
 void printGridState(const struct GameGrid *obj, const enum GameState phase);
-void cleanupGrid(struct GameGrid *obj);
 int getGridSize(struct GameGrid *obj);
 void checkForBlockedPenguins(struct GameGrid *gameGrid);
 bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
@@ -218,23 +217,6 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
         }
         printf("\n");
     }
-}
-
-void cleanupGrid(struct GameGrid *obj)
-{
-    const int rows = obj->rows;
-    const int cols = obj->cols;
-
-    for (int i = 0; i < rows; i++)
-    {
-        for (int j = 0; j < cols; j++)
-        {
-            free(obj->grid[i][j].label);
-        }
-        free(obj->grid[i]);
-    }
-
-    free(obj->grid);
 }
 
 int getRandomInt(const int min, const int max)
