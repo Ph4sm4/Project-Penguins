@@ -43,7 +43,7 @@ createGameSystemObject()
     obj.displayUI = &displayUI;
     obj.askForAction = &askForAction;
 
-    obj.numberOfPenguins = 1;
+    obj.numberOfPenguins = 2;
     obj.playerTurn = 0;
 
     return obj;
@@ -84,23 +84,23 @@ void displayUI(struct GameSystem *game)
         if (game->player_1.collectedFishes > game->player_2.collectedFishes)
         {
             printf("\n==============================\n");
-            printfYellow("%s's (P1) WON!", game->player_1.name);
+            printfYellow("%s (P1) WON!", game->player_1.name);
             printf(" points: %d\n", game->player_1.collectedFishes);
 
             printf("==============================\n");
 
-            printfGreen("%s's (P2) LOST :/", game->player_2.name);
+            printfGreen("%s (P2) LOST :/", game->player_2.name);
             printf(" points: %d\n", game->player_2.collectedFishes);
         }
         else if (game->player_1.collectedFishes < game->player_2.collectedFishes)
         {
             printf("\n==============================\n");
-            printfYellow("%s's (P2) WON!", game->player_2.name);
+            printfYellow("%s (P2) WON!", game->player_2.name);
             printf(" points: %d\n", game->player_2.collectedFishes);
 
             printf("==============================\n");
 
-            printfOrange("%s's (P1) LOST :/", game->player_1.name);
+            printfOrange("%s (P1) LOST :/", game->player_1.name);
             printf(" points: %d\n", game->player_1.collectedFishes);
         }
         else

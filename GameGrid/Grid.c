@@ -55,7 +55,7 @@ void constructGrid(struct GameGrid *obj)
     }
 
     const int gridSize = obj->rows * obj->cols;
-    const int perlin2DArrayW = 256; // a 2d array 256x256 smaller arrays dont really make any sense
+    const int perlin2DArrayW = 256; // a 2d array 256x256, smaller arrays dont really make any sense
     const int perlin2DArraySize = perlin2DArrayW * perlin2DArrayW;
 
     // allocating memory for arrays needed to generate the noise
