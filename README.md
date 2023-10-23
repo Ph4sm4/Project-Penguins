@@ -11,5 +11,9 @@ mkdir build
 cd build
 cmake ..
 make
-.\ProjectPenguins.exe 
+```
+
+After that is done simply run:
+```bash
+.\ProjectPenguins.exe
 ```
