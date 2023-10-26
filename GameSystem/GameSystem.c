@@ -172,6 +172,7 @@ void askForAction(struct GameSystem *game)
             if (placedPenguins == game->numberOfPenguins * 2)
             {
                 game->phase = (enum GameState)MovementPhase;
+                game->GameGrid.checkForBlockedPenguins(&game->GameGrid);
             }
         }
         break;
