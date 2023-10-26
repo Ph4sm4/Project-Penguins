@@ -9,7 +9,7 @@ set(SOURCES
     GameSystem/GameSystem.c
 )
 
-add_executable(ProjectPenguins main.c GameGrid/Grid.c Player/Player.c GameSystem/GameSystem.c)
+add_executable(ProjectPenguins ${SOURCES})
 
 set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_C_FLAGS_DEBUG "-g")
