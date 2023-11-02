@@ -19,7 +19,6 @@ bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
 
 // private functions:
 void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctaves, float *noiseOutput, float bias);
-int getRandomInt(const int min, const int max);
 bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y);
 
 // =========================================
@@ -81,7 +80,7 @@ void constructGrid(struct GameGrid *obj)
     {
         for (int j = 0; j < cols; j++)
         {
-            /*
+            /* TO BE DISCUSSED WHY THIS WON'T WORK AS I WOULD EXPECT IT TO
             // int sectionWidth = perlin2DArrayW / rows;
             // int sectionHeight = perlin2DArrayW / cols; // both are gonna get floored so no overflow possible
 
@@ -144,12 +143,14 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
     printf("%*sY%*s", 3, "", 3, "");
 
     int numSpaces;
+    // print column indexes
     for (int i = 0; i < obj->cols; i++)
     {
         numSpaces = 4 - (int)log10(i + 1);
         printf("%d%*s", i + 1, numSpaces, "");
     }
     printf("\n%*s", 5, "");
+    // print column separators
     for (int i = 0; i < obj->cols * 5; i++)
     {
         printf("-");
@@ -158,7 +159,7 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
 
     for (int i = 0; i < obj->rows; i++)
     {
-        numSpaces = 4 - (int)log10(i + 1);
+        numSpaces = 4 - (int)log10(i + 1); // this expression gets the number of number of digits in a character (for 1234 we get length of 4)
 
         printf("%d%*s| ", i + 1, numSpaces, "");
 
@@ -217,11 +218,6 @@ void printGridState(const struct GameGrid *obj, const enum GameState phase)
         }
         printf("\n");
     }
-}
-
-int getRandomInt(const int min, const int max)
-{
-    return rand() % (max - min + 1) + min;
 }
 
 void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctaves, float *noiseOutput, float bias)
@@ -293,7 +289,7 @@ void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctave
             noiseOutput[y * nWidth + x] = noiseValue / scalingFactorAcc;
             /*
              * by dividing by the scalingFactorAcc we are making sure that the value range of our points is gonna
-             * be in range from 0 to 1
+             * be from 0 to 1
              */
         }
     }

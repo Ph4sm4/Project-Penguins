@@ -18,6 +18,8 @@ void moveAPenguin(struct GameSystem *game, struct GridPoint *initialPoint, struc
 void placeAPenguin(struct GameGrid *gameGrid, struct GridPoint *point, struct GameSystem *game);
 void printfError(char *message);
 struct Player *getCurrentPlayer(struct GameSystem *game);
+// getValidatedChoicePoint() and getValidatedMovePoint() -> they both return a GridPoint* if the provided x, y coordinates are considered as valid according to all of the rules
+// otherwise they return NULL
 struct GridPoint *getValidatedChoicePoint(struct GameSystem *game, const int x, const int y);
 struct GridPoint *getValidatedMovePoint(struct GameSystem *game, struct GridPoint *initialPoint, const int x, const int y);
 void printCurrentPlayerName(struct GameSystem *game);
