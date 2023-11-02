@@ -1,9 +1,9 @@
 # Project-Penguins
 
-## **CMake required**
+**CMake 3.10 or later required**
  
 ### Compile & run
-- Navigate to the project location. *(e.g. C:\Users\...\Project-Penguins)*
+- Navigate to the project location. *(e.g. C:\Users\\...\Project-Penguins)*
 - Execute the following commands to build the project with CMake:
 
 ```bash
