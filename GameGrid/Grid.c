@@ -231,6 +231,7 @@ void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctave
      * baseSeed - base seed array of random values between 0 and 1
      * nOctaves - the number of iterations of the algorithm that we want to apply, maximum is log2(base seed array size)
      * noiseOutput - a pointer to the output array
+     * bias - changes how "smooth" produced values (and therefore the graph based on those values) are going to be
      */
     for (int x = 0; x < nWidth; x++)
     {
