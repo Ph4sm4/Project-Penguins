@@ -13,7 +13,7 @@ struct GameGrid
     float *noiseSeed2D;
     float *perlinNoise2D;
 
-    // Function to construct the grid based on specified rows and columns
+    // Function to construct the grid based on specified rows and columns. generation done using perlin noise
     void (*constructGrid)(struct GameGrid *obj);
 
     // Function to print the current state of the grid based on the game phase
