@@ -14,14 +14,24 @@ void displayUI(struct GameSystem *game);
 void askForAction(struct GameSystem *game);
 
 // private functions:
+
+// Function to place a penguin on the grid
 void moveAPenguin(struct GameSystem *game, struct GridPoint *initialPoint, struct GridPoint *destination);
+
+// Function to move a penguin from an initial point to a destination point
 void placeAPenguin(struct GameGrid *gameGrid, struct GridPoint *point, struct GameSystem *game);
+
+// Function to print an error message in red and wait for user input
 void printfError(char *message);
+
+// Function to print the name of the current player in orange or green
 struct Player *getCurrentPlayer(struct GameSystem *game);
+
 // getValidatedChoicePoint() and getValidatedMovePoint() -> they both return a GridPoint* if the provided x, y coordinates are considered as valid according to all of the rules
 // otherwise they return NULL
 struct GridPoint *getValidatedChoicePoint(struct GameSystem *game, const int x, const int y);
 struct GridPoint *getValidatedMovePoint(struct GameSystem *game, struct GridPoint *initialPoint, const int x, const int y);
+
 void printCurrentPlayerName(struct GameSystem *game);
 
 // =========================================

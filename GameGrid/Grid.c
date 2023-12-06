@@ -18,7 +18,11 @@ void checkForBlockedPenguins(struct GameGrid *gameGrid);
 bool isPointInBounds(const struct GameGrid *gameGrid, const int x, const int y);
 
 // private functions:
+
+// generates perlin noise values, in-depth explanation in the body of the function
 void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctaves, float *noiseOutput, float bias);
+
+//
 bool canMoveToPoint(struct GameGrid *gameGrid, const int x, const int y);
 
 // =========================================
