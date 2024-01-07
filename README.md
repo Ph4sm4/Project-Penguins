@@ -1,6 +1,6 @@
 # Project-Penguins
 
-**CMake 3.10 or later required**
+**CMake 3.10 or later required | GCC MinGW Kit recommended**
  
 ### Compile & run
 - Navigate to the project location. *(e.g. C:\Users\\...\Project-Penguins)*
