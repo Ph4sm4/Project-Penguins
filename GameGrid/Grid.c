@@ -302,9 +302,9 @@ void generatePerlinNoise2D(int nWidth, int nHeight, float *baseSeed, int nOctave
 
 void checkForBlockedPenguins(struct GameGrid *gameGrid)
 {
-    for (int x = 0; x < gameGrid->rows; x++)
+    for (int x = 1; x < gameGrid->rows - 1; x++)
     {
-        for (int y = 0; y < gameGrid->cols; y++)
+        for (int y = 1; y < gameGrid->cols - 1; y++)
         {
             if (gameGrid->grid[x][y].owner == NULL)
                 continue;
